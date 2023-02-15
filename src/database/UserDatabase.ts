@@ -5,17 +5,29 @@ export class UserDatabase extends BaseDatabase {
     public static TABLE_USERS = "users"
 
     public async findUsers(q: string | undefined) {
+        let usersDB
+
         if(q) {
             const result: UserDB[] = await BaseDatabase
             .connection(UserDatabase.TABLE_USERS)
             .where('name', 'LIKE', `%${q}%`)
 
-            return result
+            usersDB = result
         } else {
             const result: UserDB[] = await BaseDatabase
             .connection(UserDatabase.TABLE_USERS)
 
-            return result
+            usersDB = result
         }
+
+        return usersDB
+    }
+
+    public async findUserByEmail(email: string){
+        const [userDB]: UserDB[] | undefined[] = await BaseDatabase
+        .connection(UserDatabase.TABLE_USERS)
+        .where({ email })
+
+        return userDB
     }
 }
