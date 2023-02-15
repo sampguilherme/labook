@@ -10,9 +10,9 @@ CREATE TABLE users(
 
 INSERT INTO users(id, name, email, password, role)
 VALUES
-    ('u001', 'Guilherme', 'guilherme@email.com', 'guilherme2003', 'Administrador'),
-    ('u002', 'Geovanna', 'geovanna@email.com', 'geovanna2004', 'Usuário'),
-    ('u003', 'Fulano', 'fulano@email.com', 'fulano2002', 'Usuário');
+    ('u001', 'Guilherme', 'guilherme@email.com', 'guilherme2003', 'ADMIN'),
+    ('u002', 'Geovanna', 'geovanna@email.com', 'geovanna2004', 'NORMAL'),
+    ('u003', 'Fulano', 'fulano@email.com', 'fulano2002', 'NORMAL');
 
 SELECT * FROM users;
 
