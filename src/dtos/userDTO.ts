@@ -15,3 +15,14 @@ export interface LoginOutput {
     message: string,
     token: string
 }
+
+export interface SingnupInput {
+    name: unknown,
+    email: unknown,
+    password: unknown
+}
+
+export interface SingnupOutput {
+    message: string,
+    token: string
+}

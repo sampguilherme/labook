@@ -35,7 +35,18 @@ VALUES
     ('p002', 'u003', 'Como funciona essa rede social?'),
     ('p003', 'u002', 'Gostei muito do labook');
 
-SELECT * FROM posts;
+SELECT 
+    posts.id,
+    posts.content,
+    posts.likes,
+    posts.dislikes,
+    posts.created_at,
+    posts.updated_at,
+    posts.creator_id,
+    users.name AS creator_name
+FROM posts
+JOIN users
+ON posts.creator_id = users.id;
 
 CREATE TABLE likes_dislikes(
     user_id TEXT NOT NULL,
