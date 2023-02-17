@@ -1,3 +1,4 @@
+
 import { UserDB } from "../types";
 import { BaseDatabase } from "./BaseDatabase";
 
@@ -29,5 +30,11 @@ export class UserDatabase extends BaseDatabase {
         .where({ email })
 
         return userDB
+    }
+
+    public async insertUser(newUserDB: UserDB){
+        await BaseDatabase
+            .connection(UserDatabase.TABLE_USERS)
+            .insert(newUserDB)
     }
 }
