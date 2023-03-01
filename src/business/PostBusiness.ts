@@ -1,6 +1,6 @@
 
 import { PostDatabase } from "../database/PostDatabase";
-import { GetPostsInput, GetPostsOutput } from "../dtos/postDTO";
+import { CreatePostInput, GetPostsInput, GetPostsOutput } from "../dtos/postDTO";
 import { BadRequestError } from "../errors/BadRequestError";
 import { Post } from "../models/Post";
 import { IdGenerator } from "../services/IdGenerator";
@@ -46,5 +46,44 @@ export class PostBusiness{
         const output: GetPostsOutput = posts
 
         return output
+    }
+
+    public createPost = async (input: CreatePostInput): Promise<void> => {
+        const { token, content } = input
+
+        if(!token){
+            throw new BadRequestError("'token' esta vazio")
+        }
+
+        const payload = this.tokenManager.getPayload(token)
+
+        if(!payload){
+            throw new BadRequestError("'token' inváido")
+        }
+
+        if(typeof content !== "string"){
+            throw new BadRequestError("'name' deve ser string")
+        }
+    
+        const id = this.idGenerator.generate()
+        const createdAt = new Date().toISOString()
+        const updatedAt = new Date().toISOString()
+        const creatorId = payload.id
+        const creatorName = payload.name
+
+        const post = new Post(
+            id,
+            content,
+            0,
+            0,
+            createdAt,
+            updatedAt,
+            creatorId,
+            creatorName
+        )
+
+        const postDB = post.toDBModel()
+
+        await this.postDatabase.insert(postDB)
     }
 }
