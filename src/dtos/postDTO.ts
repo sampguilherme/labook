@@ -7,8 +7,9 @@ export interface GetPostsInput{
 
 export type GetPostsOutput = PostModel[]
 
-export interface CreatPostInput {
-    token: string | undefined
+export interface CreatePostInput {
+    token: string | undefined,
+    content: unknown
 }
 
 export interface EditPostInput {
