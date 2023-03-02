@@ -15,7 +15,7 @@ export interface CreatePostInput {
 export interface EditPostInput {
     idToEdit: string,
     token: string | undefined,
-    name: unknown
+    content: unknown
 }
 
 export interface DeletePostInput {

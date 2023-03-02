@@ -1,11 +1,12 @@
 
 import { PostDatabase } from "../database/PostDatabase";
-import { CreatePostInput, GetPostsInput, GetPostsOutput } from "../dtos/postDTO";
+import { CreatePostInput, EditPostInput, GetPostsInput, GetPostsOutput } from "../dtos/postDTO";
 import { BadRequestError } from "../errors/BadRequestError";
+import { NotFoundError } from "../errors/NotFoundError";
 import { Post } from "../models/Post";
 import { IdGenerator } from "../services/IdGenerator";
 import { TokenManager } from "../services/TokenManager";
-import { PostWithCreatorDB } from "../types";
+import { PostDB, PostWithCreatorDB } from "../types";
 
 
 export class PostBusiness{
@@ -85,5 +86,55 @@ export class PostBusiness{
         const postDB = post.toDBModel()
 
         await this.postDatabase.insert(postDB)
+    }
+
+    public editPost = async (input: EditPostInput): Promise<void> => {
+        const { idToEdit ,token, content } = input
+
+        if(!token){
+            throw new BadRequestError("'token' esta vazio")
+        }
+
+        const payload = this.tokenManager.getPayload(token)
+
+        if(!payload){
+            throw new BadRequestError("'token' inváido")
+        }
+
+        if(typeof content !== "string"){
+            throw new BadRequestError("'content' deve ser string")
+        }
+
+        const postDB = await this.postDatabase.findById(idToEdit)
+
+        if(!postDB){
+            throw new NotFoundError("'id' não encontrado")
+        }
+
+        const creatorId = payload.id
+
+        if(postDB.creator_id !== payload.id){
+           throw new BadRequestError("somente quem criou o post pode editá-lo") 
+        }
+
+        const creatorName = payload.name
+
+        const post = new Post(
+            postDB.id,
+            postDB.content,
+            postDB.likes,
+            postDB.dislikes,
+            postDB.created_at,
+            postDB.updated_at,
+            creatorId,
+            creatorName
+        )
+
+        post.setContent(content)
+        post.setUpdatedAt(new Date().toISOString())
+
+        const updatedPostDB = post.toDBModel()
+
+        await this.postDatabase.update(idToEdit, updatedPostDB)
     }
 }
