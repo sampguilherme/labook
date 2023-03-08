@@ -1,6 +1,6 @@
 
 import { PostDatabase } from "../database/PostDatabase";
-import { CreatePostInput, DeletePostInput, EditPostInput, GetPostsInput, GetPostsOutput } from "../dtos/postDTO";
+import { CreatePostInput, DeletePostInput, EditPostInput, GetPostsInput, GetPostsOutput, LikeOrDislikePostInput } from "../dtos/postDTO";
 import { BadRequestError } from "../errors/BadRequestError";
 import { NotFoundError } from "../errors/NotFoundError";
 import { Post } from "../models/Post";
@@ -139,7 +139,7 @@ export class PostBusiness{
     }
 
     public deletePost = async (input: DeletePostInput): Promise<void> => {
-        const { idToDelete ,token, } = input
+        const { idToDelete ,token } = input
 
         if(!token){
             throw new BadRequestError("'token' esta vazio")
@@ -149,6 +149,40 @@ export class PostBusiness{
 
         if(!payload){
             throw new BadRequestError("'token' inváido")
+        }
+
+        const postDB = await this.postDatabase.findById(idToDelete)
+
+        if(!postDB){
+            throw new NotFoundError("'id' não encontrado")
+        }
+
+        const creatorId = payload.id
+
+        if(
+            payload.role !== USER_ROLES.ADMIN &&
+            postDB.creator_id !== creatorId){
+           throw new BadRequestError("somente quem criou o post pode deleta-lo") 
+        }
+
+        await this.postDatabase.delete(idToDelete)
+    }
+
+    public likeOrDislikePost = async (input: LikeOrDislikePostInput): Promise<void> => {
+        const { idToLikeOrDislike ,token, like} = input
+
+        if(!token){
+            throw new BadRequestError("'token' esta vazio")
+        }
+
+        const payload = this.tokenManager.getPayload(token)
+
+        if(!payload){
+            throw new BadRequestError("'token' inváido")
+        }
+
+        if(typeof like !== "boolean"){
+            throw new BadRequestError("'like' deve ser boolean")
         }
 
         const postDB = await this.postDatabase.findById(idToDelete)
